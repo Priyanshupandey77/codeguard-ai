@@ -1,10 +1,9 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-
-dotenv.config();
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
@@ -13,6 +12,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/review", reviewRoutes);
 
 app.get("/", (req, res) => {
     res.json({
