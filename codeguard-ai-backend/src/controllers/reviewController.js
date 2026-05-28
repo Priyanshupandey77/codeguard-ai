@@ -1,3 +1,4 @@
+import Review from "../models/review.js";
 import { reviewCodeWithAI } from "../services/aiService.js";
 
 export const reviewCode = async (req, res) => {
@@ -10,13 +11,24 @@ export const reviewCode = async (req, res) => {
       });
     }
 
-    const result = await reviewCodeWithAI(code);
+    // AI review
+    const aiResponse = await reviewCodeWithAI(code);
 
-    res.json({
+    // save review
+    const savedReview = await Review.create({
+      user: req.user._id,
+      code,
+      result: aiResponse,
+      score: aiResponse.score,
+    });
+
+    res.status(200).json({
       success: true,
-      review: result,
+      review: savedReview,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
