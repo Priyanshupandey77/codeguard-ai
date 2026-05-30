@@ -1,3 +1,6 @@
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+
 const ScoreCard = ({ score }) => {
   const getColor = () => {
     if (score <= 3) return "text-red-500";
@@ -11,9 +14,25 @@ const ScoreCard = ({ score }) => {
     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
       <p className="text-zinc-400 mb-2">Code Quality</p>
 
-      <h1 className={`text-6xl font-bold ${getColor()}`}>{score}</h1>
-
-      <p className="text-zinc-500">out of 10</p>
+      <div className="w-32 h-32 mx-auto">
+        <CircularProgressbar
+          value={score * 10}
+          text={`${score}/10`}
+          styles={{
+            path: {
+              stroke: getColor(),
+            },
+            text: {
+              fill: getColor(),
+              fontSize: "16px",
+              fontWeight: "bold",
+            },
+            trail: {
+              stroke: "#27272a",
+            },
+          }}
+        />
+      </div>
     </div>
   );
 };
