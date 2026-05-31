@@ -1,8 +1,17 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, History, LogOut } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-[#09090B] text-white">
@@ -16,7 +25,12 @@ const DashboardLayout = ({ children }) => {
           <h1 className="text-xl font-bold">CodeGuard AI</h1>
         </div>
 
-        <button className="text-zinc-400 hover:text-white">Logout</button>
+        <button
+          onClick={handleLogout}
+          className="text-zinc-400 hover:text-white"
+        >
+          Logout
+        </button>
       </header>
 
       <div className="flex">
@@ -45,7 +59,10 @@ const DashboardLayout = ({ children }) => {
               History
             </Link>
 
-            <button className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-900 w-full text-left">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-900 w-full text-left"
+            >
               <LogOut size={18} />
               Logout
             </button>
