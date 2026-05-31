@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { reviewCode } from "../services/reviewService";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ScoreCard from "../components/ScoreCard";
 import ReviewSection from "../components/ReviewSection";
 import { Bot } from "lucide-react";
+import { getHistory } from "../services/historyService";
 
 const Dashboard = () => {
   const [code, setCode] = useState("");
@@ -25,28 +26,71 @@ const Dashboard = () => {
     }
   };
 
+  const [stats, setStats] = useState({
+    reviews: 0,
+    averageScore: 0,
+    issues: 0,
+  });
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const data = await getHistory();
+
+      const reviews = data.reviews;
+
+      const averageScore =
+        reviews.reduce((sum, review) => sum + review.score, 0) /
+        (reviews.length || 1);
+
+      const totalIssues = reviews.reduce(
+        (count, review) =>
+          count +
+          review.result.bugs.length +
+          review.result.performance.length +
+          review.result.security.length +
+          review.result.cleanCode.length,
+        0,
+      );
+
+      setStats({
+        reviews: reviews.length,
+        averageScore: averageScore.toFixed(1),
+        issues: totalIssues,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-4xl font-bold mb-6">CodeGuard AI</h1>
+        <h1 className="text-4xl font-bold">Welcome back 👋</h1>
+
+        <p className="text-zinc-400 mt-2 mb-1">
+          Review your code with AI-powered insights.
+        </p>
 
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <p className="text-zinc-400 text-sm">Reviews</p>
 
-            <h2 className="text-3xl font-bold">24</h2>
+            <h2 className="text-3xl font-bold">{stats.reviews}</h2>
           </div>
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <p className="text-zinc-400 text-sm">Avg Score</p>
 
-            <h2 className="text-3xl font-bold">7.2</h2>
+            <h2 className="text-3xl font-bold">{stats.averageScore}</h2>
           </div>
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <p className="text-zinc-400 text-sm">Issues Found</p>
 
-            <h2 className="text-3xl font-bold">61</h2>
+            <h2 className="text-3xl font-bold">{stats.issues}</h2>
           </div>
         </div>
 
