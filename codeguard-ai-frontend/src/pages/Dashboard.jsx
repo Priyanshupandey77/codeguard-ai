@@ -6,11 +6,14 @@ import ScoreCard from "../components/ScoreCard";
 import ReviewSection from "../components/ReviewSection";
 import { Bot } from "lucide-react";
 import { getHistory } from "../services/historyService";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Dashboard = () => {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState(null);
+  const { user } = useContext(AuthContext);
 
   const handleReview = async () => {
     try {
@@ -68,7 +71,7 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-4xl font-bold">Welcome back 👋</h1>
+        <h1 className="text-4xl font-bold">Welcome back, {user?.name}</h1>
 
         <p className="text-zinc-400 mt-2 mb-1">
           Review your code with AI-powered insights.
@@ -217,3 +220,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+
