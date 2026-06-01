@@ -19,3 +19,20 @@ export const getReviewHistory = async (req, res) => {
     });
   }
 };
+
+export const clearHistory = async (req, res) => {
+  try {
+    await Review.deleteMany({
+      user: req.user._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "History cleared successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
