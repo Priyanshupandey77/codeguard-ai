@@ -11,3 +11,14 @@ export const getHistory = async () => {
 
   return response.data;
 };
+
+export const clearHistory = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await api.delete("/history/clear", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

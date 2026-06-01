@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getHistory } from "../services/historyService";
 import DashboardLayout from "../layouts/DashboardLayout";
+import { clearHistory } from "../services/historyService";
 
 const History = () => {
   const [reviews, setReviews] = useState([]);
@@ -21,9 +22,41 @@ const History = () => {
     }
   };
 
+  const handleClearHistory = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete all review history?",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await clearHistory();
+
+      setReviews([]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <DashboardLayout>
-      <h1 className="text-4xl font-bold mb-8">Review History</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Review History</h1>
+
+        <button
+          onClick={handleClearHistory}
+          className="
+      bg-red-600
+      hover:bg-red-700
+      px-4
+      py-2
+      rounded-lg
+      transition
+    "
+        >
+          Clear History
+        </button>
+      </div>
 
       {loading ? (
         <p>Loading...</p>
