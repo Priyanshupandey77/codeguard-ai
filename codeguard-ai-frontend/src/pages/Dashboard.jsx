@@ -8,12 +8,18 @@ import { Bot } from "lucide-react";
 import { getHistory } from "../services/historyService";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { getRepos } from "../services/githubService";
+import { Search } from "lucide-react";
 
 const Dashboard = () => {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState(null);
   const { user } = useContext(AuthContext);
+  const [githubUsername, setGithubUsername] = useState("");
+  const [repos, setRepos] = useState([]);
+  const [loadingRepos, setLoadingRepos] = useState(false);
+  const [repoSearch, setRepoSearch] = useState("");
 
   const handleReview = async () => {
     try {
@@ -68,6 +74,27 @@ const Dashboard = () => {
     }
   };
 
+  const handleFetchRepos = async () => {
+    if (!githubUsername.trim()) return;
+
+    try {
+      setLoadingRepos(true);
+
+      const data = await getRepos(githubUsername);
+
+      setRepos(data.repos);
+    } catch (error) {
+      console.log(error);
+      alert("Could not fetch repositories");
+    } finally {
+      setLoadingRepos(false);
+    }
+  };
+
+  const filteredRepos = repos.filter((repo) =>
+    repo.name.toLowerCase().includes(repoSearch.toLowerCase()),
+  );
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-6">
@@ -96,6 +123,76 @@ const Dashboard = () => {
             <h2 className="text-3xl font-bold">{stats.issues}</h2>
           </div>
         </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-6">
+          <h2 className="text-xl font-bold mb-4">GitHub Repository Review</h2>
+
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={githubUsername}
+              onChange={(e) => setGithubUsername(e.target.value)}
+              placeholder="Enter GitHub Username"
+              className="flex-1 bg-zinc-800 rounded-lg p-3"
+            />
+
+            <button
+              onClick={handleFetchRepos}
+              className="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-lg"
+            >
+              {loadingRepos ? "Loading..." : "Fetch"}
+            </button>
+          </div>
+        </div>
+
+        {repos.length > 0 && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Repositories</h2>
+
+              <div className="relative">
+  <Search
+    size={16}
+    className="absolute left-3 top-3 text-zinc-400"
+  />
+
+  <input
+    type="text"
+    value={repoSearch}
+    onChange={(e) =>
+      setRepoSearch(e.target.value)
+    }
+    placeholder="Search repository..."
+    className="
+      pl-10
+      bg-zinc-800
+      border
+      border-zinc-700
+      rounded-lg
+      px-3
+      py-2
+      text-sm
+      w-72
+      focus:outline-none
+      focus:border-blue-500
+    "
+  />
+</div>
+            </div>
+
+            <div className="space-y-3">
+              {filteredRepos.slice(0,3).map((repo) => (
+                <div key={repo.id} className="bg-zinc-800 rounded-lg p-4">
+                  <h3 className="font-semibold">📁 {repo.name}</h3>
+
+                  <p className="text-zinc-400 text-sm mt-1">
+                    {repo.description || "No description"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 border-b-0 rounded-t-2xl px-4 py-3">
           <div className="flex items-center gap-3">
@@ -220,6 +317,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-
