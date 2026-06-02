@@ -17,12 +17,14 @@ const DashboardLayout = ({ children }) => {
     <div className="min-h-screen bg-[#09090B] text-white">
       {/* Navbar */}
       <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-8">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold">
-            ⚡
+          <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold">
+            R
           </div>
 
-          <h1 className="text-xl font-bold">CodeGuard AI</h1>
+          <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 bg-clip-text text-transparent">
+            ReviewPilot
+          </h1>
         </div>
 
         <button
