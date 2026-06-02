@@ -9,6 +9,7 @@ import { getHistory } from "../services/historyService";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { getRepos } from "../services/githubService";
+import { getRepoFiles } from "../services/githubService";
 import { Search } from "lucide-react";
 
 const Dashboard = () => {
@@ -20,6 +21,8 @@ const Dashboard = () => {
   const [repos, setRepos] = useState([]);
   const [loadingRepos, setLoadingRepos] = useState(false);
   const [repoSearch, setRepoSearch] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState(null);
+  const [files, setFiles] = useState([]);
 
   const handleReview = async () => {
     try {
@@ -95,6 +98,21 @@ const Dashboard = () => {
     repo.name.toLowerCase().includes(repoSearch.toLowerCase()),
   );
 
+  const handleRepoSelect = async (repo) => {
+  try {
+    setSelectedRepo(repo);
+
+    const data = await getRepoFiles(
+      githubUsername,
+      repo.name
+    );
+
+    setFiles(data.files);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-6">
@@ -151,19 +169,17 @@ const Dashboard = () => {
               <h2 className="text-xl font-bold">Repositories</h2>
 
               <div className="relative">
-  <Search
-    size={16}
-    className="absolute left-3 top-3 text-zinc-400"
-  />
+                <Search
+                  size={16}
+                  className="absolute left-3 top-3 text-zinc-400"
+                />
 
-  <input
-    type="text"
-    value={repoSearch}
-    onChange={(e) =>
-      setRepoSearch(e.target.value)
-    }
-    placeholder="Search repository..."
-    className="
+                <input
+                  type="text"
+                  value={repoSearch}
+                  onChange={(e) => setRepoSearch(e.target.value)}
+                  placeholder="Search repository..."
+                  className="
       pl-10
       bg-zinc-800
       border
@@ -176,13 +192,28 @@ const Dashboard = () => {
       focus:outline-none
       focus:border-blue-500
     "
-  />
-</div>
+                />
+              </div>
             </div>
 
             <div className="space-y-3">
-              {filteredRepos.slice(0,3).map((repo) => (
-                <div key={repo.id} className="bg-zinc-800 rounded-lg p-4">
+              {filteredRepos.slice(0, 3).map((repo) => (
+                <div
+                  key={repo.id}
+                  onClick={() => handleRepoSelect(repo)}
+                  className={`
+    rounded-lg
+    p-4
+    cursor-pointer
+    transition-all
+
+    ${
+      selectedRepo?.id === repo.id
+        ? "bg-blue-600/20 border border-blue-500"
+        : "bg-zinc-800 hover:bg-zinc-700"
+    }
+  `}
+                >
                   <h3 className="font-semibold">📁 {repo.name}</h3>
 
                   <p className="text-zinc-400 text-sm mt-1">
@@ -193,6 +224,36 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+        {selectedRepo && (
+  <div className="mt-6 bg-blue-500/10 border border-blue-500 rounded-xl p-4">
+    <p className="text-blue-400 font-medium">
+      Selected Repository
+    </p>
+
+    <h3 className="text-xl font-bold mt-1">
+      {selectedRepo.name}
+    </h3>
+    {files.length > 0 && (
+  <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mt-6">
+    <h2 className="text-xl font-bold mb-4">
+      Repository Files
+    </h2>
+
+    <div className="space-y-2">
+      {files.map((file) => (
+        <div
+          key={file.path}
+          className="bg-zinc-800 p-3 rounded-lg"
+        >
+          📄 {file.name}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+  </div>
+)}
 
         <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 border-b-0 rounded-t-2xl px-4 py-3">
           <div className="flex items-center gap-3">

@@ -11,3 +11,21 @@ export const getRepos = async (username) => {
 
   return response.data;
 };
+
+export const getRepoFiles = async (
+  owner,
+  repo
+) => {
+  const token = localStorage.getItem("token");
+
+  const response = await api.get(
+    `/github/files/${owner}/${repo}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
