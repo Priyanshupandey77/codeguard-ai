@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { getRepos } from "../services/githubService";
 import { getRepoFiles } from "../services/githubService";
+import { getFileContent } from "../services/githubService";
 import { Search } from "lucide-react";
 
 const Dashboard = () => {
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const [repoSearch, setRepoSearch] = useState("");
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [files, setFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleReview = async () => {
     try {
@@ -99,19 +101,56 @@ const Dashboard = () => {
   );
 
   const handleRepoSelect = async (repo) => {
-  try {
-    setSelectedRepo(repo);
+    if (!repo) return;
 
-    const data = await getRepoFiles(
+    try {
+      setSelectedRepo(repo);
+      setSelectedFile(null);
+      setCode(""); // 🔥 important reset
+
+      const data = await getRepoFiles(githubUsername, repo.name);
+
+      setFiles(data.files || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleFileClick = async (file) => {
+  if (!selectedRepo) return;
+
+  try {
+    setSelectedFile(file);
+
+    if (file.type === "dir") {
+      const data = await getRepoFiles(
+        githubUsername,
+        selectedRepo.name,
+        file.path,
+      );
+
+      setFiles(data.files || []);
+      return;
+    }
+
+    const res = await getFileContent(
       githubUsername,
-      repo.name
+      selectedRepo.name,
+      file.path,
     );
 
-    setFiles(data.files);
-  } catch (error) {
-    console.log(error);
+    const content =
+      typeof res?.content?.content === "string"
+        ? res.content.content
+        : "";
+
+    setCode(content);
+  } catch (err) {
+    console.log(err);
   }
 };
+  console.log("CODE:", code);
+  console.log("TYPE:", typeof code);
 
   return (
     <DashboardLayout>
@@ -225,35 +264,40 @@ const Dashboard = () => {
           </div>
         )}
         {selectedRepo && (
-  <div className="mt-6 bg-blue-500/10 border border-blue-500 rounded-xl p-4">
-    <p className="text-blue-400 font-medium">
-      Selected Repository
-    </p>
+          <div className="mt-6 bg-blue-500/10 border border-blue-500 rounded-xl p-4">
+            <p className="text-blue-400 font-medium">Selected Repository</p>
 
-    <h3 className="text-xl font-bold mt-1">
-      {selectedRepo.name}
-    </h3>
-    {files.length > 0 && (
-  <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mt-6">
-    <h2 className="text-xl font-bold mb-4">
-      Repository Files
-    </h2>
+            <h3 className="text-xl font-bold mt-1">{selectedRepo.name}</h3>
+            {files.length > 0 && (
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mt-6">
+                <h2 className="text-xl font-bold mb-4">Repository Files</h2>
 
-    <div className="space-y-2">
-      {files.map((file) => (
-        <div
-          key={file.path}
-          className="bg-zinc-800 p-3 rounded-lg"
-        >
-          📄 {file.name}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+                <div className="space-y-2">
+                  {files.map((file) => (
+                    <div
+                      key={file.path}
+                      onClick={() => handleFileClick(file)}
+                      className={`
+      p-3
+      rounded-lg
+      cursor-pointer
+      transition-all
 
-  </div>
-)}
+      ${
+        selectedFile?.path === file.path
+          ? "bg-blue-600/20 border border-blue-500"
+          : "bg-zinc-800 hover:bg-zinc-700"
+      }
+    `}
+                    >
+                      {file.type === "dir" ? "📁" : "📄"} {file.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 border-b-0 rounded-t-2xl px-4 py-3">
           <div className="flex items-center gap-3">
@@ -265,7 +309,7 @@ const Dashboard = () => {
           <div className="text-sm text-zinc-400">JavaScript</div>
 
           <div className="text-sm text-zinc-500">
-            {code.split("\n").length} Lines
+            {typeof code === "string" ? code.split("\n").length : 0} Lines
           </div>
         </div>
 
@@ -274,8 +318,8 @@ const Dashboard = () => {
             height="500px"
             defaultLanguage="javascript"
             theme="vs-dark"
-            value={code}
-            onChange={(value) => setCode(value)}
+            value={typeof code === "string" ? code : ""}
+            onChange={(v) => setCode(v || "")}
           />
         </div>
 
