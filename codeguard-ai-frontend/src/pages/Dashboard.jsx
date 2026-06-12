@@ -25,10 +25,12 @@ const Dashboard = () => {
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [originalCode, setOriginalCode] = useState("");
 
   const handleReview = async () => {
     try {
       setLoading(true);
+      setOriginalCode(code);
 
       const result = await reviewCode(code);
 
@@ -409,6 +411,30 @@ const Dashboard = () => {
                 icon="🧹"
                 items={review.cleanCode}
               />
+            </div>
+          </div>
+        )}
+        {review?.refactoredCode && (
+          <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+            <h2 className="text-2xl font-bold mb-4">AI Refactored Version</h2>
+
+            <pre className="bg-zinc-950 p-4 rounded-xl overflow-x-auto text-sm">
+              <code>{review.refactoredCode}</code>
+            </pre>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setCode(review.refactoredCode)}
+                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
+              >
+                Replace Editor
+              </button>
+
+              <button
+                onClick={() => setCode(originalCode)}
+                className="bg-zinc-700 hover:bg-zinc-600 px-4 py-2 rounded-lg"
+              >
+                Restore Original
+              </button>
             </div>
           </div>
         )}
