@@ -94,6 +94,18 @@ Scoring rules:
 - 7–8 good code
 - 9–10 excellent production-ready code
 
+Also generate a refactored version of the code.
+
+The refactored code should:
+
+- Fix identified issues
+- Improve readability
+- Follow best practices
+- Maintain the same functionality
+
+Return it in:
+refactoredCode
+
 Return format:
 {
   "bugs": [
@@ -103,7 +115,8 @@ Return format:
   "security": [],
   "cleanCode": [],
   "score": 0,
-  "summary": ""
+  "summary": "",
+   "refactoredCode": ""
 }
 
 Code:
@@ -141,6 +154,11 @@ ${code}
       security: normalizeIssues(parsed.security),
       cleanCode: normalizeIssues(parsed.cleanCode),
       summary: typeof parsed.summary === "string" ? parsed.summary : "",
+      refactoredCode:
+    typeof parsed.refactoredCode === "string"
+      ? parsed.refactoredCode
+      : "",
+      
     };
 
     // Hybrid scoring (AI + rules)
@@ -156,6 +174,7 @@ ${code}
       cleanCode: review.cleanCode,
       summary: review.summary,
       score: finalScore,
+      refactoredCode: review.refactoredCode,
     };
   } catch (error) {
     console.error("AI Error:", error);
