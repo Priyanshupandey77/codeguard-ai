@@ -106,7 +106,7 @@ const Dashboard = () => {
     try {
       setSelectedRepo(repo);
       setSelectedFile(null);
-      setCode(""); // 🔥 important reset
+      setCode("");
 
       const data = await getRepoFiles(githubUsername, repo.name);
 
@@ -117,40 +117,36 @@ const Dashboard = () => {
   };
 
   const handleFileClick = async (file) => {
-  if (!selectedRepo) return;
+    if (!selectedRepo) return;
 
-  try {
-    setSelectedFile(file);
+    try {
+      setSelectedFile(file);
 
-    if (file.type === "dir") {
-      const data = await getRepoFiles(
+      if (file.type === "dir") {
+        const data = await getRepoFiles(
+          githubUsername,
+          selectedRepo.name,
+          file.path,
+        );
+
+        setFiles(data.files || []);
+        return;
+      }
+
+      const res = await getFileContent(
         githubUsername,
         selectedRepo.name,
         file.path,
       );
 
-      setFiles(data.files || []);
-      return;
+      const content =
+        typeof res?.content?.content === "string" ? res.content.content : "";
+
+      setCode(content);
+    } catch (err) {
+      console.log(err);
     }
-
-    const res = await getFileContent(
-      githubUsername,
-      selectedRepo.name,
-      file.path,
-    );
-
-    const content =
-      typeof res?.content?.content === "string"
-        ? res.content.content
-        : "";
-
-    setCode(content);
-  } catch (err) {
-    console.log(err);
-  }
-};
-  console.log("CODE:", code);
-  console.log("TYPE:", typeof code);
+  };
 
   return (
     <DashboardLayout>
