@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { reviewCode } from "../services/reviewService";
 import DashboardLayout from "../layouts/DashboardLayout";
-import ScoreCard from "../components/ScoreCard";
-import ReviewSection from "../components/ReviewSection";
 import { Bot } from "lucide-react";
 import { getHistory } from "../services/historyService";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import CodeComparison from "../components/CodeComparison";
 import GithubPanel from "../components/GithubPanel";
+import StatsCard from "../components/StatsCard";
+import ReviewResults from "../components/ReviewResults";
 
 const Dashboard = () => {
   const [code, setCode] = useState("");
@@ -17,21 +16,6 @@ const Dashboard = () => {
   const [review, setReview] = useState(null);
   const { user } = useContext(AuthContext);
   const [originalCode, setOriginalCode] = useState("");
-
-  const handleReview = async () => {
-    try {
-      setLoading(true);
-      setOriginalCode(code);
-
-      const result = await reviewCode(code);
-
-      setReview(result.review.result);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const [stats, setStats] = useState({
     reviews: 0,
@@ -71,6 +55,20 @@ const Dashboard = () => {
       console.log(error);
     }
   };
+  const handleReview = async () => {
+    try {
+      setLoading(true);
+      setOriginalCode(code);
+
+      const result = await reviewCode(code);
+
+      setReview(result.review.result);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -81,25 +79,7 @@ const Dashboard = () => {
           Review your code with AI-powered insights.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
-            <p className="text-zinc-400 text-sm">Reviews</p>
-
-            <h2 className="text-3xl font-bold">{stats.reviews}</h2>
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
-            <p className="text-zinc-400 text-sm">Avg Score</p>
-
-            <h2 className="text-3xl font-bold">{stats.averageScore}</h2>
-          </div>
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
-            <p className="text-zinc-400 text-sm">Issues Found</p>
-
-            <h2 className="text-3xl font-bold">{stats.issues}</h2>
-          </div>
-        </div>
+        <StatsCard stats={stats} />
 
         <GithubPanel setCode={setCode} setOriginalCode={setOriginalCode} />
 
@@ -179,54 +159,11 @@ const Dashboard = () => {
           </div>
         )}
 
-        {review && (
-          <div className="mt-8 space-y-6">
-            <div className="bg-zinc-900 p-4 rounded-lg">
-              <h2 className="text-xl font-bold">
-                <div className="grid lg:grid-cols-4 gap-6 mt-8">
-                  <div className="lg:col-span-1">
-                    <ScoreCard score={review.score} />
-                  </div>
-
-                  <div className="lg:col-span-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-                    <h2 className="text-xl font-bold mb-3">Summary</h2>
-
-                    <p className="text-zinc-400">{review.summary}</p>
-                  </div>
-                </div>
-              </h2>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-6 mt-6">
-              <ReviewSection title="Bugs" icon="🐛" items={review.bugs} />
-
-              <ReviewSection
-                title="Performance"
-                icon="⚡"
-                items={review.performance}
-              />
-
-              <ReviewSection
-                title="Security"
-                icon="🔒"
-                items={review.security}
-              />
-
-              <ReviewSection
-                title="Clean Code"
-                icon="🧹"
-                items={review.cleanCode}
-              />
-            </div>
-          </div>
-        )}
-        {review?.refactoredCode && (
-          <CodeComparison
-            originalCode={originalCode}
-            refactoredCode={review.refactoredCode}
-            onReplace={() => setCode(review.refactoredCode)}
-          />
-        )}
+        <ReviewResults
+          review={review}
+          originalCode={originalCode}
+          onReplace={() => setCode(review?.refactoredCode || "")}
+        />
       </div>
     </DashboardLayout>
   );
