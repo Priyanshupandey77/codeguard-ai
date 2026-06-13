@@ -40,8 +40,8 @@ const History = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Review History</h1>
+      <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-8">
+       <h1 className="text-2xl md:text-4xl font-bold">Review History</h1>
 
         <button
           onClick={handleClearHistory}
@@ -61,7 +61,7 @@ const History = () => {
       {loading ? (
         <p>Loading...</p>
       ) : reviews.length === 0 ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 text-center">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 md:p-10 text-center">
           <h2 className="text-2xl font-bold mb-3">No Reviews Yet</h2>
 
           <p className="text-zinc-400">

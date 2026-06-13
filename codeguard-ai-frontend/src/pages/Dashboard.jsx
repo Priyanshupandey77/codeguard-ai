@@ -72,8 +72,10 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-4xl font-bold">Welcome back, {user?.name}</h1>
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
+        <h1 className="text-2xl md:text-4xl font-bold">
+          Welcome back, {user?.name}
+        </h1>
 
         <p className="text-zinc-400 mt-2 mb-1">
           Review your code with AI-powered insights.
@@ -99,7 +101,7 @@ const Dashboard = () => {
 
         <div className="overflow-hidden rounded-b-2xl border border-zinc-800">
           <Editor
-            height="500px"
+            height={window.innerWidth < 768 ? "250px" : "400px"}
             defaultLanguage="javascript"
             theme="vs-dark"
             value={typeof code === "string" ? code : ""}
@@ -112,7 +114,9 @@ const Dashboard = () => {
           disabled={loading}
           className="
             mt-6
+            w-full md:w-auto
             flex
+            justify-center
             items-center
             gap-2
            bg-blue-600
