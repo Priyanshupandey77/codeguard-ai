@@ -89,7 +89,7 @@ const GithubPanel = ({ setCode, setOriginalCode }) => {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-6">
       <h2 className="text-xl font-bold mb-4">GitHub Repository Review</h2>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           value={githubUsername}
@@ -107,10 +107,10 @@ const GithubPanel = ({ setCode, setOriginalCode }) => {
       </div>
       {repos.length > 0 && (
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-6">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-4">
             <h2 className="text-xl font-bold">Repositories</h2>
 
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <Search
                 size={16}
                 className="absolute left-3 top-3 text-zinc-400"
@@ -130,7 +130,7 @@ const GithubPanel = ({ setCode, setOriginalCode }) => {
       px-3
       py-2
       text-sm
-      w-72
+      w-full md:w-72
       focus:outline-none
       focus:border-blue-500
     "
@@ -145,7 +145,7 @@ const GithubPanel = ({ setCode, setOriginalCode }) => {
                 onClick={() => handleRepoSelect(repo)}
                 className={`
                 rounded-lg
-                p-4
+                p-3 md:p-4
                 cursor-pointer
                 transition-all
             
@@ -170,7 +170,9 @@ const GithubPanel = ({ setCode, setOriginalCode }) => {
         <div className="mt-6 bg-blue-500/10 border border-blue-500 rounded-xl p-4">
           <p className="text-blue-400 font-medium">Selected Repository</p>
 
-          <h3 className="text-xl font-bold mt-1">{selectedRepo.name}</h3>
+          <h3 className="text-lg md:text-xl font-bold mt-1 break-all">
+            {selectedRepo.name}
+          </h3>
           {files.length > 0 && (
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mt-6">
               <h2 className="text-xl font-bold mb-4">Repository Files</h2>
@@ -193,7 +195,9 @@ const GithubPanel = ({ setCode, setOriginalCode }) => {
       }
     `}
                   >
-                    {file.type === "dir" ? "📁" : "📄"} {file.name}
+                    <div className="break-all">
+                      {file.type === "dir" ? "📁" : "📄"} {file.name}
+                    </div>
                   </div>
                 ))}
               </div>
