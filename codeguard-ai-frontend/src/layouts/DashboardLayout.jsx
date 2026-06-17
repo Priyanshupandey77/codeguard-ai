@@ -32,8 +32,6 @@ const DashboardLayout = ({ children }) => {
             ReviewPilot
           </h1>
         </div>
-
-        
       </header>
 
       {sidebarOpen && (
@@ -54,12 +52,24 @@ const DashboardLayout = ({ children }) => {
         p-4
       "
           >
-            <div className="flex justify-end mb-4">
-              <button onClick={() => setSidebarOpen(false)}>
-                <X size={24} />
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white font-bold">
+                  R
+                </div>
+
+                <h1 className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 bg-clip-text text-transparent">
+                  ReviewPilot
+                </h1>
+              </div>
+
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-1 rounded-md hover:bg-zinc-800 transition"
+              >
+                <X size={22} />
               </button>
             </div>
-
             <nav className="space-y-2">
               <Link
                 to="/"
