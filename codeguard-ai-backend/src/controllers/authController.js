@@ -25,10 +25,15 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
     });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+    const { password: _, ...userWithoutPassword } = user.toObject();
 
     res.status(201).json({
       message: "User registered successfully",
-      user,
+      token,
+      user: userWithoutPassword,
     });
   } catch (error) {
     res.status(500).json({
@@ -52,6 +57,14 @@ export const loginUser = async (req, res) => {
       });
     }
 
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Invalid credentials",
+      });
+    }
+
     //generate token
     const token = jwt.sign(
       {
@@ -62,10 +75,13 @@ export const loginUser = async (req, res) => {
         expiresIn: "7d",
       },
     );
+
+    const { password: _, ...userWithoutPassword } = user.toObject();
+
     res.status(200).json({
       message: "Login successful",
       token,
-      user,
+      user: userWithoutPassword,
     });
   } catch (error) {
     res.status(500).json({
