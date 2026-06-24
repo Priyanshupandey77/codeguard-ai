@@ -31,7 +31,7 @@ const Register = () => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      navigate("/");
+      window.location.href = "/";
     } catch (error) {
       console.log(error);
       alert("Registration failed");
