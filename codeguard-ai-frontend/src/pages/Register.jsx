@@ -26,9 +26,11 @@ const Register = () => {
     try {
       setLoading(true);
 
-      await api.post("/auth/register", formData);
+      const res = await api.post("/auth/register", formData);
 
-      navigate("/login");
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/");
     } catch (error) {
       console.log(error);
       alert("Registration failed");
